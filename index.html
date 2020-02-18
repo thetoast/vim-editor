@@ -23,9 +23,18 @@
   <body onload="setKeyMap('vim')">
     <div id="wrapper">
       <textarea id="code" name="code"></textarea>
-    <div>
+    </div>
+
+    <div id="vimrc-wrapper" class="sn-component">
+      <div id="vimrc-header" class="sk-app-bar"><b>Vimrc</b></div>
+      <textarea id="vimrc" name="vimrc" width="100%"></textarea>
+    </div>
 
     <div id="select-wrapper">
+      <span id="edit-vimrc" onclick="editVimrc()">Edit Vimrc</span>
+      <span id="save-vimrc" class="hidden" onclick="saveVimrc()">Save Vimrc</span>
+      <span id="cancel-vimrc" class="hidden" onclick="cancelVimrc()">Cancel Editing</span>
+      &nbsp;|&nbsp;
       <span id="language-label">Language:</span>
       <select id="select" onchange="onLanguageSelect(event)"></select>
       <span id="default-label" onclick="setDefaultLanguage(event)">Set as Default</span>

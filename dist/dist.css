@@ -2232,6 +2232,12 @@ body, html {
   height: 100%;
   margin: 0;
   font-size: var(--sn-stylekit-base-font-size);
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
 }
 
 #wrapper {
@@ -2242,8 +2248,24 @@ body, html {
   overflow-x: hidden;
 }
 
+#vimrc-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#vimrc {
+  height: 100%;
+}
+
+#edit-vimrc, #save-vimrc, #cancel-vimrc {
+  font-size: 12px;
+  color: var(--sn-stylekit-neutral-color);
+  cursor: pointer;
+}
+
 #select-wrapper {
-  width: 100%;
   margin: 0;
   padding-left: 16px;
   border-top: 1px solid var(--sn-stylekit-border-color);
@@ -2377,3 +2399,5 @@ body, html {
   color: var(--sn-stylekit-foreground-color);
   opacity: 0.6;
 }
+
+/*# sourceMappingURL=app.css.map */

@@ -19,13 +19,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var componentManager;
   var workingNote, clientData;
   var lastValue, lastUUID;
-  var editor, select;
+  var editor, vimrcEditor, select;
+  var vimrcWrapper, vimrcArea, saveVimrc, editVimrc, cancelVimrc;
   var defaultMode = "JavaScript";
   var ignoreTextChange = false;
   var initialLoad = true;
 
   function loadComponentManager() {
-    var permissions = [{name: "stream-context-item"}]
+    var permissions = [{name: "stream-context-item"}, {name: "stream-items"}]
     componentManager = new ComponentManager(permissions, function(){
       // on ready
       var platform = componentManager.platform;
@@ -63,6 +64,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
       lastValue = null;
       initialLoad = true;
       lastUUID = note.uuid;
+
+      loadAndParseVimrc();
     }
 
     workingNote = note;
@@ -95,6 +98,67 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
   }
 
+  function loadAndParseVimrc() {
+    var vimrc = componentManager.componentDataValueForKey("vimrc");
+
+    if (!vimrc) return;
+    vimrcArea.value = vimrc;
+
+    // grab each line of note and push into vim API
+    vimrc.split("\n").forEach(line => {
+      CodeMirror.Vim.handleEx(editor, line);
+    });
+
+    if (!vimrcEditor) {
+      createVimrcEditor();
+    }
+  }
+
+  function createVimrcEditor() {
+    vimrcEditor = CodeMirror.fromTextArea(vimrcArea, {
+      lineNumbers: true,
+      styleSelectedText: true,
+      lineWrapping: true
+    });
+    vimrcEditor.setSize("100%", "100%");
+    vimrcEditor.setOption("keyMap", "vim");
+    vimrcWrapper.classList.add("hidden");
+  }
+
+  window.editVimrc = function () {
+    vimrcWrapper.classList.remove("hidden");
+    saveVimrc.classList.remove("hidden");
+    cancelVimrc.classList.remove("hidden");
+    editVimrc.classList.add("hidden");
+  }
+
+  window.saveVimrc = function () {
+    vimrcWrapper.classList.add("hidden");
+    saveVimrc.classList.add("hidden");
+    cancelVimrc.classList.add("hidden");
+    editVimrc.classList.remove("hidden");
+    componentManager.setComponentDataValueForKey("vimrc", vimrcEditor.getValue());
+    loadAndParseVimrc();
+  }
+
+  window.cancelVimrc = function () {
+    var vimrc = componentManager.componentDataValueForKey("vimrc");
+    vimrcEditor.getDoc().setValue(vimrc);
+    vimrcWrapper.classList.add("hidden");
+    saveVimrc.classList.add("hidden");
+    cancelVimrc.classList.add("hidden");
+    editVimrc.classList.remove("hidden");
+    vimrcEditor.getDoc().setValue(vimrc);
+  }
+
+  function initVimrcControls() {
+    vimrcWrapper = document.getElementById("vimrc-wrapper");
+    vimrcArea = document.getElementById("vimrc");
+    saveVimrc = document.getElementById("save-vimrc");
+    editVimrc = document.getElementById("edit-vimrc");
+    cancelVimrc = document.getElementById("cancel-vimrc");
+  }
+
   function loadEditor() {
     editor = CodeMirror.fromTextArea(document.getElementById("code"), {
       lineNumbers: true,
@@ -108,6 +172,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }, 1);
 
     createSelectElements();
+    initVimrcControls();
 
     editor.on("change", function(){
       if(ignoreTextChange) {return;}
@@ -207,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   function changeMode(inputMode) {
     if(!inputMode) { return; }
-    
+
     const mode = inputModeToMode(inputMode);
 
     if(mode) {
