@@ -15863,13 +15863,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
   function loadAndParseVimrc() {
     var vimrc = componentManager.componentDataValueForKey("vimrc");
 
-    if (!vimrc) return;
-    vimrcArea.value = vimrc;
+    if (vimrc) {
+      vimrcArea.value = vimrc;
 
-    // grab each line of note and push into vim API
-    vimrc.split("\n").forEach(function (line) {
-      CodeMirror.Vim.handleEx(editor, line);
-    });
+      // grab each line of note and push into vim API
+      vimrc.split("\n").forEach(function (line) {
+        CodeMirror.Vim.handleEx(editor, line);
+      });
+    }
 
     if (!vimrcEditor) {
       createVimrcEditor();
